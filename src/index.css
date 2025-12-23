@@ -1,0 +1,399 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   GICC - Global Intelligence Command Center
+   Main Stylesheet (Standard CSS - No @apply)
+   ============================================================ */
+
+/* --- Base Styles --- */
+:root {
+  --color-primary: #3b82f6;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-success: #22c55e;
+  --bg-dark: #0f172a;
+  --bg-dark-secondary: #1e293b;
+  --text-light: #f1f5f9;
+  --text-muted: #94a3b8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* --- Selection --- */
+::selection {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* --- Scrollbar Styling --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #475569;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #64748b;
+}
+
+/* --- Light Mode Scrollbar --- */
+.light ::-webkit-scrollbar-track {
+  background-color: #e2e8f0;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background-color: #94a3b8;
+}
+
+/* --- Glassmorphism Utilities --- */
+.glass {
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background-color: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+/* --- Glow Effects --- */
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.glow-red {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+/* --- Card Hover Effects --- */
+.card-hover {
+  transition: all 300ms ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Gradient Backgrounds --- */
+.gradient-dark {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+}
+
+.gradient-danger {
+  background: linear-gradient(135deg, #991b1b 0%, #ef4444 100%);
+}
+
+/* --- Score Gauge Bar --- */
+.score-bar {
+  height: 6px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background-color: #334155;
+}
+
+.score-bar-fill {
+  height: 100%;
+  transition: all 500ms ease-out;
+}
+
+/* --- Pulse Animation for Critical Items --- */
+.pulse-critical {
+  animation: pulse-critical 2s infinite;
+}
+
+@keyframes pulse-critical {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+
+  50% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+}
+
+/* --- Marquee Animation --- */
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* --- Fade In Animation --- */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* --- Slide Up Animation --- */
+@keyframes slideUp {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* --- Print & PDF Styles --- */
+@media print {
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-break {
+    page-break-before: always;
+  }
+}
+
+.pdf-mode {
+  background-color: white;
+  color: #0f172a;
+  width: 794px !important;
+  max-width: 794px !important;
+}
+
+.pdf-mode * {
+  color: #0f172a;
+}
+
+/* --- Sector Color Classes --- */
+.sector-crypto {
+  color: #a78bfa;
+}
+
+.sector-macro {
+  color: #60a5fa;
+}
+
+.sector-geopolitics {
+  color: #f87171;
+}
+
+.sector-tech {
+  color: #22d3ee;
+}
+
+.sector-finance {
+  color: #4ade80;
+}
+
+.sector-energy {
+  color: #facc15;
+}
+
+.sector-industrials {
+  color: #fb923c;
+}
+
+.sector-transport {
+  color: #818cf8;
+}
+
+.sector-healthcare {
+  color: #f472b6;
+}
+
+/* --- Light Mode Overrides --- */
+:root:not(.dark) body,
+.light body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* --- Skeleton Loading --- */
+.skeleton {
+  background-color: #334155;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  border-radius: 4px;
+}
+
+.light .skeleton {
+  background-color: #cbd5e1;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* --- Input Focus Rings --- */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  border-color: #3b82f6;
+}
+
+/* --- Button Base --- */
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 200ms ease;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #3b82f6;
+}
+
+.btn-secondary {
+  background-color: #334155;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #475569;
+}
+
+.btn-danger {
+  background-color: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #ef4444;
+}
+
+/* --- Tooltip --- */
+.tooltip {
+  position: absolute;
+  z-index: 50;
+  padding: 4px 8px;
+  font-size: 12px;
+  background-color: #020617;
+  color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.tooltip-trigger:hover .tooltip {
+  opacity: 1;
+}
+
+/* --- Badge Styles --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-high {
+  background-color: rgba(220, 38, 38, 0.5);
+  color: #fca5a5;
+}
+
+.badge-medium {
+  background-color: rgba(202, 138, 4, 0.5);
+  color: #fde047;
+}
+
+.badge-low {
+  background-color: rgba(22, 163, 74, 0.5);
+  color: #86efac;
+}
+
+/* --- Tab Active State --- */
+.tab-active {
+  border-bottom: 2px solid #3b82f6;
+  color: #3b82f6;
+}
+
+/* --- Watchlist Highlight --- */
+.watchlist-match {
+  border-color: rgba(250, 204, 21, 0.5);
+  background-color: rgba(202, 138, 4, 0.1);
+}
+
+/* --- Line Clamp Utility --- */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
