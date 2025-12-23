@@ -115,14 +115,14 @@ interface ItemCardProps {
 
 export const ItemCard: React.FC<ItemCardProps> = ({ item, isWatchlistMatch }) => (
     <div className={`group bg-white dark:bg-slate-800 border rounded-xl p-4 transition-all duration-200 shadow-sm hover:shadow-lg ${isWatchlistMatch
-            ? 'border-yellow-400/50 dark:border-yellow-500/50 bg-yellow-50 dark:bg-yellow-900/10'
-            : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500'
+        ? 'border-yellow-400/50 dark:border-yellow-500/50 bg-yellow-50 dark:bg-yellow-900/10'
+        : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500'
         }`}>
         <div className="flex justify-between items-start mb-3">
             <div className="flex items-center gap-2 flex-wrap">
                 <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${item.type === 'NEWS'
-                        ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
-                        : 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                    ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                    : 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
                     }`}>
                     {item.type}
                 </span>
@@ -137,7 +137,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, isWatchlistMatch }) =>
                 </span>
             </div>
             <div className={`w-3 h-3 rounded-full flex-shrink-0 ${item.impact === 'HIGH' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)] animate-pulse' :
-                    item.impact === 'MEDIUM' ? 'bg-orange-400' : 'bg-green-400'
+                item.impact === 'MEDIUM' ? 'bg-orange-400' : 'bg-green-400'
                 }`} title={`Impact: ${item.impact}`} />
         </div>
 
@@ -191,8 +191,8 @@ export const RumorCard: React.FC<RumorCardProps> = ({ rumor }) => {
             <div className="flex justify-between items-start mb-4">
                 <div className="flex gap-2">
                     <div className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${rumor.status === 'UNVERIFIED'
-                            ? 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
-                            : 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800'
+                        ? 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
+                        : 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800'
                         }`}>
                         {rumor.status}
                     </div>
@@ -403,3 +403,41 @@ export const ScoreIcons = {
     liquidity: Droplets,
     policy: Gavel
 };
+
+// --- Error Boundary ---
+interface ErrorBoundaryProps {
+    children: React.ReactNode;
+    fallback?: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+    hasError: boolean;
+}
+
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+    constructor(props: ErrorBoundaryProps) {
+        super(props);
+        this.state = { hasError: false };
+    }
+
+    static getDerivedStateFromError(_: Error): ErrorBoundaryState {
+        return { hasError: true };
+    }
+
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        console.error("Uncaught error:", error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return this.props.fallback || (
+                <div className="p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
+                    <h3 className="font-bold">Something went wrong.</h3>
+                    <p className="text-sm">Please refresh the page to try again.</p>
+                </div>
+            );
+        }
+
+        return this.props.children;
+    }
+}

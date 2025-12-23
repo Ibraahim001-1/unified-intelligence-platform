@@ -44,7 +44,6 @@ import {
     RumorCard,
     SnapshotCard,
     WatchlistModal,
-    LoadingSpinner,
     ScoreIcons
 } from './components/CommonComponents';
 import {
@@ -60,297 +59,20 @@ import {
     IntelItem,
     AnalysisParams,
     AnalysisResult,
+    AnalysisResult,
     COUNTRIES,
     ASSETS,
     HORIZONS,
     RISKS,
     MODELS
 } from './types';
+import { ErrorBoundary, LoadingSpinner } from './components/CommonComponents';
 
-// ============================================================
-// SIDEBAR COMPONENT
-// ============================================================
+// Lazy Load Components
+const Sidebar = React.lazy(() => import('./components/Sidebar'));
+const AIAnalysisPanel = React.lazy(() => import('./components/AIAnalysisPanel'));
 
-interface SidebarProps {
-    isOpen: boolean;
-    onClose: () => void;
-    selectedSector: SectorID | 'RUMORS' | 'AI_ANALYSIS' | null;
-    onSelectSector: (sector: SectorID | 'RUMORS' | 'AI_ANALYSIS' | null) => void;
-    showLogs: boolean;
-    onShowLogs: () => void;
-    isDarkMode: boolean;
-}
 
-const Sidebar: React.FC<SidebarProps> = ({
-    isOpen,
-    onClose,
-    selectedSector,
-    onSelectSector,
-    showLogs,
-    onShowLogs,
-    isDarkMode
-}) => (
-    <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <Globe className="text-white" size={22} />
-                </div>
-                <div>
-                    <h1 className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">GICC</h1>
-                    <p className="text-[10px] text-slate-500 font-medium">Intelligence Command</p>
-                </div>
-            </div>
-            <button onClick={onClose} className="md:hidden text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                <X size={24} />
-            </button>
-        </div>
-
-        <div className="p-4 overflow-y-auto h-[calc(100vh-80px)]">
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Main Views</div>
-            <nav className="space-y-1">
-                <button
-                    onClick={() => { onSelectSector(null); onClose(); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all ${selectedSector === null && !showLogs
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                        }`}
-                >
-                    <LayoutDashboard size={18} />
-                    Intel Dashboard
-                </button>
-
-                <button
-                    onClick={() => { onSelectSector('AI_ANALYSIS'); onClose(); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all ${selectedSector === 'AI_ANALYSIS'
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                        }`}
-                >
-                    <Sparkles size={18} />
-                    AI Analysis
-                    <span className="ml-auto text-[10px] bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded">NEW</span>
-                </button>
-            </nav>
-
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 mt-6">Sectors</div>
-            <nav className="space-y-1">
-                {SECTORS.map(sector => (
-                    <button
-                        key={sector.id}
-                        onClick={() => { onSelectSector(sector.id); onClose(); }}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all ${selectedSector === sector.id
-                            ? 'bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700'
-                            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                            }`}
-                    >
-                        <sector.icon size={18} className={selectedSector === sector.id ? (isDarkMode ? sector.color : sector.lightColor) : ''} />
-                        {sector.label}
-                    </button>
-                ))}
-            </nav>
-
-            <div className="my-4 border-t border-slate-200 dark:border-slate-800" />
-
-            <nav className="space-y-1">
-                <button
-                    onClick={() => { onSelectSector('RUMORS'); onClose(); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all ${selectedSector === 'RUMORS'
-                        ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50'
-                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                        }`}
-                >
-                    <ShieldAlert size={18} />
-                    Rumor Overlay
-                </button>
-
-                <button
-                    onClick={() => { onShowLogs(); onClose(); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all ${showLogs
-                        ? 'bg-slate-800 text-white'
-                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                        }`}
-                >
-                    <FileText size={18} />
-                    System Logs
-                </button>
-            </nav>
-        </div>
-    </aside>
-);
-
-// ============================================================
-// AI ANALYSIS PANEL
-// ============================================================
-
-interface AIAnalysisPanelProps {
-    onResult: (result: AnalysisResult | null) => void;
-    loading: boolean;
-    setLoading: (v: boolean) => void;
-}
-
-const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({ onResult, loading, setLoading }) => {
-    const [params, setParams] = usePersistentState<AnalysisParams>('gicc_ai_params', {
-        query: '',
-        secondaryQuery: '',
-        countryFocus: ['Global'],
-        assetFocus: [],
-        horizon: HORIZONS[0],
-        riskFocus: [],
-        language: 'Somali',
-        selectedModel: MODELS[0].id
-    });
-    const [error, setError] = useState<string | null>(null);
-
-    const toggleItem = (arr: string[], item: string, key: keyof AnalysisParams) => {
-        const newArr = arr.includes(item) ? arr.filter(x => x !== item) : [...arr, item];
-        setParams(prev => ({ ...prev, [key]: newArr }));
-    };
-
-    const handleGenerate = async () => {
-        if (!params.query.trim()) {
-            setError('Please enter a research topic');
-            return;
-        }
-        setLoading(true);
-        setError(null);
-        onResult(null);
-
-        try {
-            const result = await generateAnalysis(params);
-            onResult(result);
-        } catch (err: any) {
-            setError(err.message || 'An error occurred');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <div className="bg-white dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
-                <Sparkles className="text-purple-500" />
-                AI Research Generator
-            </h3>
-
-            <div className="space-y-5">
-                {/* Primary Query */}
-                <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">
-                        Primary Research Topic *
-                    </label>
-                    <input
-                        type="text"
-                        value={params.query}
-                        onChange={(e) => setParams(prev => ({ ...prev, query: e.target.value }))}
-                        placeholder="e.g., Impact of Fed rate cuts on emerging markets"
-                        className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none focus:border-blue-500"
-                    />
-                </div>
-
-                {/* Secondary Query */}
-                <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">
-                        Secondary Topic (Correlation Analysis)
-                    </label>
-                    <input
-                        type="text"
-                        value={params.secondaryQuery}
-                        onChange={(e) => setParams(prev => ({ ...prev, secondaryQuery: e.target.value }))}
-                        placeholder="e.g., Bitcoin price correlation"
-                        className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none focus:border-blue-500"
-                    />
-                </div>
-
-                {/* Region Focus */}
-                <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">Region Focus</label>
-                    <div className="flex flex-wrap gap-2">
-                        {COUNTRIES.slice(0, 10).map(c => (
-                            <button
-                                key={c}
-                                onClick={() => toggleItem(params.countryFocus, c, 'countryFocus')}
-                                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${params.countryFocus.includes(c)
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-blue-500'
-                                    }`}
-                            >
-                                {c}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Horizon */}
-                <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">Time Horizon</label>
-                    <select
-                        value={params.horizon}
-                        onChange={(e) => setParams(prev => ({ ...prev, horizon: e.target.value }))}
-                        className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none"
-                    >
-                        {HORIZONS.map(h => (
-                            <option key={h} value={h}>{h}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Language & Model */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">Language</label>
-                        <select
-                            value={params.language}
-                            onChange={(e) => setParams(prev => ({ ...prev, language: e.target.value as 'Somali' | 'English' }))}
-                            className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none"
-                        >
-                            <option value="Somali">Somali</option>
-                            <option value="English">English</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">AI Model</label>
-                        <select
-                            value={params.selectedModel}
-                            onChange={(e) => setParams(prev => ({ ...prev, selectedModel: e.target.value }))}
-                            className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none"
-                        >
-                            {MODELS.map(m => (
-                                <option key={m.id} value={m.id}>{m.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                {/* Error */}
-                {error && (
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl text-sm">
-                        {error}
-                    </div>
-                )}
-
-                {/* Generate Button */}
-                <button
-                    onClick={handleGenerate}
-                    disabled={loading}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30"
-                >
-                    {loading ? (
-                        <>
-                            <RefreshCw size={20} className="animate-spin" />
-                            Generating Intelligence...
-                        </>
-                    ) : (
-                        <>
-                            <Sparkles size={20} />
-                            Generate Intelligence Report
-                        </>
-                    )}
-                </button>
-            </div>
-        </div>
-    );
-};
 
 // ============================================================
 // MAIN APP COMPONENT
@@ -503,15 +225,19 @@ const App: React.FC = () => {
                 )}
 
                 {/* Sidebar */}
-                <Sidebar
-                    isOpen={mobileMenuOpen}
-                    onClose={() => setMobileMenuOpen(false)}
-                    selectedSector={selectedSector}
-                    onSelectSector={handleSectorSelect}
-                    showLogs={showLogs}
-                    onShowLogs={handleShowLogs}
-                    isDarkMode={isDarkMode}
-                />
+                <ErrorBoundary fallback={<div className="w-72 bg-slate-900 border-r border-slate-800" />}>
+                    <React.Suspense fallback={<div className="w-72 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex items-center justify-center"><LoadingSpinner /></div>}>
+                        <Sidebar
+                            isOpen={mobileMenuOpen}
+                            onClose={() => setMobileMenuOpen(false)}
+                            selectedSector={selectedSector}
+                            onSelectSector={handleSectorSelect}
+                            showLogs={showLogs}
+                            onShowLogs={handleShowLogs}
+                            isDarkMode={isDarkMode}
+                        />
+                    </React.Suspense>
+                </ErrorBoundary>
 
                 {/* Main Content */}
                 <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -661,7 +387,11 @@ const App: React.FC = () => {
                             <div className="max-w-6xl mx-auto space-y-6">
                                 <div className="grid lg:grid-cols-3 gap-6">
                                     <div className="lg:col-span-1">
-                                        <AIAnalysisPanel onResult={setAiResult} loading={aiLoading} setLoading={setAiLoading} />
+                                        <ErrorBoundary>
+                                            <React.Suspense fallback={<div className="h-96 flex items-center justify-center"><LoadingSpinner /></div>}>
+                                                <AIAnalysisPanel onResult={setAiResult} loading={aiLoading} setLoading={setAiLoading} />
+                                            </React.Suspense>
+                                        </ErrorBoundary>
                                     </div>
                                     <div className="lg:col-span-2 space-y-6">
                                         {aiLoading ? (
